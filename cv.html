@@ -1,0 +1,539 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV Generator</title>
+  <style>
+    :root {
+      --theme-color: #7f9fc8;
+      --button-color: #4CAF50;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #090979, #00d4ff);
+      color: #fff;
+      transition: background 0.4s, color 0.4s;
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: var(--button-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .section-title {
+      background-color: var(--theme-color);
+      color: white;
+      padding: 6px;
+      font-weight: bold;
+      margin-top: 20px;
+      text-transform: uppercase;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table, th, td {
+      border: 1px solid black;
+      text-align: center;
+      padding: 6px;
+    }
+    .cv-output {
+      margin-top: 30px;
+    }
+    .cv {
+      border: 1px solid #000;
+      padding: 20px;
+      background: #fff;
+      margin-bottom: 30px;
+      page-break-inside: avoid;
+    }
+    img.profile-pic {
+      max-width: 120px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CV Generator</h1>
+    <label>Profile Photo:</label>
+    <input type="file" id="photo" accept="image/*">
+    <label>Name</label>
+    <input type="text" id="name">
+    <label>Father's Name</label>
+    <input type="text" id="father">
+    <label>Email</label>
+    <input type="email" id="email">
+    <label>Mobile</label>
+    <input type="text" id="mobile">
+    <label>Address</label>
+    <input type="text" id="address">
+    <label>Skills</label>
+    <textarea id="skills"></textarea>
+    <label>Description</label>
+    <textarea id="description"></textarea>
+    <label>LinkedIn</label>
+    <input type="url" id="linkedin">
+    <label>GitHub</label>
+    <input type="url" id="github">
+    <label>Choose Theme Color:</label>
+    <input type="color" id="themeColor" value="#7f9fc8">
+    <label>Select Language:</label>
+    <select id="languageToggle">
+      <option value="en">English</option>
+      <option value="hi">Hindi</option>
+    </select>
+
+    <div class="section-title">Education Background</div>
+    <table id="educationTable">
+      <thead>
+        <tr><th>Exam</th><th>Board</th><th>Year</th><th>Max Mark</th><th>Obt Mark</th><th>Percent</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div>
+      <input type="text" id="exam" placeholder="Exam">
+      <input type="text" id="board" placeholder="Board">
+      <input type="text" id="year" placeholder="Year">
+      <input type="text" id="max" placeholder="Max Mark">
+      <input type="text" id="obt" placeholder="Obt Mark">
+      <input type="text" id="percent" placeholder="%">
+      <button onclick="addEducationRow()">Add Row</button>
+    </div>
+
+    <div class="section-title">Work Experience</div>
+    <div id="experienceList"></div>
+    <input type="text" id="company" placeholder="Company Name">
+    <input type="text" id="role" placeholder="Role">
+    <input type="text" id="duration" placeholder="Duration">
+    <button onclick="addExperience()">Add Experience</button>
+
+    <button onclick="generateCV()">Generate CV</button>
+    <div class="cv-output" id="cvOutput"></div>
+  </div>
+
+  <script>
+    const translate = (text, lang) => {
+      if (lang === 'hi') {
+        const dict = {
+          'Resume': 'बायोडाटा',
+          'Personal Information': 'व्यक्तिगत जानकारी',
+          'Education Background': 'शैक्षिक पृष्ठभूमि',
+          'Skills': 'कौशल',
+          'Description': 'विवरण',
+          'Work Experience': 'कार्य अनुभव',
+          'Father\'s Name': 'पिता का नाम',
+          'Mobile': 'मोबाइल',
+          'Email': 'ईमेल',
+          'Address': 'पता',
+          'LinkedIn': 'लिंक्डइन',
+          'GitHub': 'गिटहब'
+        };
+        return dict[text] || text;
+      }
+      return text;
+    };
+
+    function addEducationRow() {
+      const row = `<tr><td>${exam.value}</td><td>${board.value}</td><td>${year.value}</td><td>${max.value}</td><td>${obt.value}</td><td>${percent.value}</td></tr>`;
+      document.querySelector('#educationTable tbody').insertAdjacentHTML('beforeend', row);
+    }
+
+    function addExperience() {
+      const exp = `<p><strong>${company.value}</strong> - ${role.value} (${duration.value})</p>`;
+      document.getElementById('experienceList').insertAdjacentHTML('beforeend', exp);
+    }
+
+    function generateCV() {
+      const lang = document.getElementById("languageToggle").value;
+      const name = document.getElementById("name").value;
+      const father = document.getElementById("father").value;
+      const email = document.getElementById("email").value;
+      const mobile = document.getElementById("mobile").value;
+      const address = document.getElementById("address").value;
+      const skills = document.getElementById("skills").value;
+      const description = document.getElementById("description").value;
+      const linkedin = document.getElementById("linkedin").value;
+      const github = document.getElementById("github").value;
+      const themeColor = document.getElementById("themeColor").value;
+      const tableHTML = document.querySelector("#educationTable tbody").innerHTML;
+      const experienceHTML = document.getElementById("experienceList").innerHTML;
+      const file = document.getElementById("photo").files[0];
+
+      function buildCV(imgTag = "") {
+        const container = document.createElement("div");
+        container.className = "cv";
+        container.innerHTML = `
+          <h2 style="text-align:center">${translate('Resume', lang)}</h2>
+          ${imgTag}
+          <p><strong>${name}</strong><br>${translate('Mobile', lang)}: ${mobile}<br>${translate('Email', lang)}: ${email}<br>${translate('Address', lang)}: ${address}</p>
+          <p><strong>${translate('LinkedIn', lang)}:</strong> <a href="${linkedin}" target="_blank">${linkedin}</a></p>
+          <p><strong>${translate('GitHub', lang)}:</strong> <a href="${github}" target="_blank">${github}</a></p>
+          <div class="section-title" style="background-color:${themeColor}">${translate('Personal Information', lang)}</div>
+          <p>${translate("Father's Name", lang)}: ${father}</p>
+          <div class="section-title" style="background-color:${themeColor}">${translate('Education Background', lang)}</div>
+          <table><thead><tr><th>Exam</th><th>Board</th><th>Year</th><th>Max</th><th>Obt</th><th>%</th></tr></thead><tbody>${tableHTML}</tbody></table>
+          <div class="section-title" style="background-color:${themeColor}">${translate('Work Experience', lang)}</div>
+          ${experienceHTML}
+          <div class="section-title" style="background-color:${themeColor}">${translate('Skills', lang)}</div>
+          <p>${skills}</p>
+          <div class="section-title" style="background-color:${themeColor}">${translate('Description', lang)}</div>
+          <p>${description}</p>
+          <button onclick="downloadPDF(this.parentElement)">Download PDF</button>
+        `;
+        document.getElementById("cvOutput").appendChild(container);
+      }
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function () {
+          const imgTag = `<img src="${reader.result}" class="profile-pic">`;
+          buildCV(imgTag);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        buildCV("");
+      }
+    }
+
+    function downloadPDF(element) {
+      if (typeof html2pdf === 'undefined') {
+        alert('PDF सुविधा लोड हो रही है, कृपया प्रतीक्षा करें।');
+        return;
+      }
+      const clone = element.cloneNode(true);
+      const btn = clone.querySelector("button");
+      if (btn) btn.remove();
+      const tempContainer = document.createElement("div");
+      tempContainer.style.position = "absolute";
+      tempContainer.style.left = "-9999px";
+      tempContainer.appendChild(clone);
+      document.body.appendChild(tempContainer);
+
+      setTimeout(() => {
+        html2pdf().set({
+          margin: 0.5,
+          filename: `CV_${Date.now()}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        }).from(clone).save().then(() => {
+          document.body.removeChild(tempContainer);
+        });
+      }, 300);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+      document.body.appendChild(script);
+    });
+  </script>
+</body>
+</html>
+ -->
+
+
+
+
+
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CV Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: linear-gradient(to right, #0066cc, #00ccff);
+      padding: 20px;
+      border-radius: 10px;
+      color: #fff;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 15px;
+      border: none;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .cv {
+      background: #fff;
+      color: #000;
+      padding: 20px;
+      margin-top: 20px;
+      border: 1px solid #333;
+    }
+    .section-title {
+      background: #007acc;
+      color: #fff;
+      padding: 6px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 5px;
+      text-align: center;
+    }
+    img.profile-pic {
+      max-width: 120px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+
+  .rv{
+   text-decoration: none;
+   padding: auto;
+   text-align: center;
+   color: #fff;
+  }
+
+  .bu
+  {
+    text-align:center;
+    background-color:tomato;
+    padding:15px 120px;
+    border: none;
+    margin:10px 190px ;
+    border-radius: 20pt;
+
+  }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>CV Generator</h2>
+    <label>Photo:</label>
+    <input type="file" id="photo" accept="image/*" />
+    <label>Name:</label>
+    <input type="text" id="name" />
+    <label>Father's Name:</label>
+    <input type="text" id="father" />
+    <label>Email:</label>
+    <input type="email" id="email" />
+    <label>Mobile:</label>
+    <input type="text" id="mobile" />
+    <label>Address:</label>
+    <input type="text" id="address" />
+    <label>Skills:</label>
+    <textarea id="skills"></textarea>
+    <label>Description:</label>
+    <textarea id="description"></textarea>
+    <label>Language:</label>
+    <select id="lang">
+      <option value="en">English</option>
+      <option value="hi">Hindi</option>
+    </select>
+
+    <div class="section-title">Education</div>
+    <table id="eduTable">
+      <thead>
+        <tr><th>Exam</th><th>Board</th><th>Year</th><th>Max</th><th>Obt</th><th>%</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <input type="text" id="exam" placeholder="Exam" />
+    <input type="text" id="board" placeholder="Board" />
+    <input type="text" id="year" placeholder="Year" />
+    <input type="text" id="max" placeholder="Max Mark" />
+    <input type="text" id="obt" placeholder="Obt Mark" />
+    <input type="text" id="percent" placeholder="%" />
+    <button onclick="addEdu()">Add Row</button>
+
+    <div class="section-title">Work Experience</div>
+    <div id="expList"></div>
+    <input type="text" id="company" placeholder="Company" />
+    <input type="text" id="role" placeholder="Role" />
+    <input type="text" id="duration" placeholder="Duration" />
+    <button onclick="addExp()">Add Experience</button>
+
+    <br><br>
+    <button onclick="generateCV()">Generate CV</button>
+
+    <br><br>
+    <div class="bu"><a href="develop  it  world.html" class="rv">BACK</a></button>
+
+    <div id="cvOutput"></div>
+  </div>
+
+  <script>
+    const translate = (text, lang) => {
+      if (lang === 'hi') {
+        const dict = {
+          'Resume': 'बायोडाटा',
+          'Education': 'शिक्षा',
+          'Work Experience': 'कार्य अनुभव',
+          'Skills': 'कौशल',
+          'Description': 'विवरण',
+          'Mobile': 'मोबाइल',
+          'Email': 'ईमेल',
+          'Address': 'पता',
+          "Father's Name": 'पिता का नाम'
+        };
+        return dict[text] || text;
+      }
+      return text;
+    };
+
+    function addEdu() {
+      const row = `<tr><td>${exam.value}</td><td>${board.value}</td><td>${year.value}</td><td>${max.value}</td><td>${obt.value}</td><td>${percent.value}</td></tr>`;
+      document.querySelector("#eduTable tbody").insertAdjacentHTML("beforeend", row);
+    }
+
+    function addExp() {
+      const html = `<p><strong>${company.value}</strong> - ${role.value} (${duration.value})</p>`;
+      document.getElementById("expList").insertAdjacentHTML("beforeend", html);
+    }
+
+    function generateCV() {
+      const lang = document.getElementById("lang").value;
+      const photo = document.getElementById("photo").files[0];
+
+      const details = {
+        name: name.value,
+        father: father.value,
+        email: email.value,
+        mobile: mobile.value,
+        address: address.value,
+        skills: skills.value,
+        desc: description.value,
+        eduHTML: document.querySelector("#eduTable tbody").innerHTML,
+        expHTML: document.getElementById("expList").innerHTML
+      };
+
+      function buildCV(imgTag = "") {
+        const div = document.createElement("div");
+        div.className = "cv";
+        div.innerHTML = `
+          <h2 style="text-align:center">${translate("Resume", lang)}</h2>
+          ${imgTag}
+          <p><strong>${details.name}</strong><br>
+          ${translate("Mobile", lang)}: ${details.mobile}<br>
+          ${translate("Email", lang)}: ${details.email}<br>
+          ${translate("Address", lang)}: ${details.address}</p>
+          <p>${translate("Father's Name", lang)}: ${details.father}</p>
+          <div class="section-title">${translate("Education", lang)}</div>
+          <table><tbody>${details.eduHTML}</tbody></table>
+          <div class="section-title">${translate("Work Experience", lang)}</div>
+          ${details.expHTML}
+          <div class="section-title">${translate("Skills", lang)}</div>
+          <p>${details.skills}</p>
+          <div class="section-title">${translate("Description", lang)}</div>
+          <p>${details.desc}</p>
+          <button onclick="downloadPDF(this.parentElement)">Download PDF</button>
+        `;
+        document.getElementById("cvOutput").innerHTML = '';
+        document.getElementById("cvOutput").appendChild(div);
+      }
+
+      if (photo) {
+        const reader = new FileReader();
+        reader.onload = function () {
+          const imgTag = `<img src="${reader.result}" class="profile-pic">`;
+          buildCV(imgTag);
+        };
+        reader.readAsDataURL(photo);
+      } else {
+        buildCV("");
+      }
+    }
+
+    function downloadPDF(element) {
+  const clone = element.cloneNode(true);
+  const btn = clone.querySelector("button");
+  if (btn) btn.remove();
+
+  const wrapper = document.createElement("div");
+  wrapper.style.position = "fixed";
+  wrapper.style.left = "-9999px";
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+
+  // Ensure images are loaded before creating PDF
+  const images = clone.querySelectorAll("img");
+  const imagePromises = Array.from(images).map(img => {
+    return new Promise(resolve => {
+      if (img.complete) return resolve();
+      img.onload = resolve;
+      img.onerror = resolve;
+    });
+  });
+
+  Promise.all(imagePromises).then(() => {
+    html2pdf().set({
+      margin: 0.5,
+      filename: `CV_${Date.now()}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: true
+      },
+      jsPDF: {
+        unit: "in",
+        format: "letter",
+        orientation: "portrait"
+      }
+    }).from(clone).save().then(() => {
+      document.body.removeChild(wrapper);
+    });
+  });
+}
+  </script>
+</body>
+</html>
